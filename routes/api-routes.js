@@ -1,5 +1,7 @@
 const db = require("../models");
 const passport = require("../config/passport");
+const { default: Axios } = require("axios");
+require('dotenv').config();
 
 module.exports = function (app) {
 
@@ -12,7 +14,7 @@ module.exports = function (app) {
   // If the user has valid login credentials, send them to the members page.
   // Otherwise the user will be sent an error
   app.post("/api/login", passport.authenticate("local"), (req, res) => {
-       res.json(req.user);
+    res.json(req.user);
   });
 
   // Route for signing up a user. The user's password is automatically hashed and stored securely thanks to
@@ -43,7 +45,7 @@ module.exports = function (app) {
   app.get("/api/user_data", (req, res, next) => {
     if (!req.user) {
       // The user is not logged in, send back an empty object
-      res.json({user:null});
+      res.json({ user: null });
     } else {
       // Otherwise send back the user's email and id
       // Sending back a password, even a hashed password, isn't a good idea
@@ -52,7 +54,45 @@ module.exports = function (app) {
       });
     }
   });
-}
 
-// https://www.googleapis.com/books/v1/volumes?q=flowers+inauthor:keyes&key=AIzaSyCTN2Wp9G0netfJqG53HV_xzEmbQJd9lZk
-// 
+  app.get("/api/search-books", (req, res) => {
+    console.log(req.body.searchBooks)
+    let book = req.body.searchBooks
+    let apiKey = process.env.DB_API
+    Axios.get("https://www.googleapis.com/books/v1/volumes?q="+book+"+inauthor:keyes&key="+apiKey+"&maxResults=10")
+    .then(data => {
+  
+      console.log(data.data.items)
+      res.json(data.data.items)
+    })
+  });
+
+
+  
+
+  // 
+
+  // Library
+  // GET route for retrieiving books for specific readers
+  app.get("/api/library", (req, res) => {
+    db.Book.findAll({
+      where: {
+        ReaderId: req.Reader.id
+      }
+    }).then(data => {
+      console.log(data)
+      res.json(data);
+    });
+  });
+
+  // // DELETE route for deleting book off out of book library
+  // app.delete("/api/library/:id", (req, res) => {
+  //   db.Book.destroy({
+  //     where: {
+  //       id: req.params.id
+  //     }
+  //   }).then(data => {
+  //     res.json(data).end();
+  //   });
+  // });
+}

@@ -21,7 +21,7 @@ function Login(props) {
       console.log(res);
       if (res.status === 200) {
         props.updateUser(res.data)
-        history.push("/home");
+        history.push("/search");
       }
     }).catch(err => console.log(err));
   }

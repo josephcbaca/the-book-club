@@ -4,11 +4,10 @@ import { Route } from 'react-router-dom';
 import Login from "./components/pages/Login";
 import SignUp from "./components/pages/SignUp";
 import Search from "./components/pages/Search";
+import Library from "./components/pages/Library";
 import axios from "axios";
 
-
 const App = () =>{
-
   const [loggedIn, setLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
 
@@ -38,6 +37,7 @@ const App = () =>{
       <Route exact path="/" render={()=> <Login updateUser={updateUser} />} />
       <Route exact path="/sign-up" component={SignUp} />
       <Route exact path="/search" render={()=> <Search loggedIn={loggedIn} currentUser = {currentUser} />}/>
+      <Route exact path="/library" render={()=> <Library loggedIn={loggedIn} currentUser = {currentUser} />}/>
     </div>
     );
 }
