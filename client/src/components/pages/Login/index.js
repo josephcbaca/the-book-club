@@ -45,7 +45,7 @@ function Login(props) {
           <div className="col-4">
             <input
               className="form-control"
-              type="text"
+              type="password"
               placeholder="Password"
               name="password"
               onChange={e => setPassword(e.target.value)}

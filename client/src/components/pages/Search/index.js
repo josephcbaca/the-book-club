@@ -7,6 +7,9 @@ import './style.css'
 function Search({ loggedIn, currentUser }) {
   const [books, setBooks] = useState("");
   const [result, setResult] = useState([]);
+  const [isImage, setIsImage] = useState("");
+  const [isAuthor, setIsAuthor] = useState("");
+  const [isInfoLink, setIsInfoLink] = useState("");
   const [isSelected, setIsSelected] = useState("")
 
   // GET search to api route
@@ -36,14 +39,16 @@ function Search({ loggedIn, currentUser }) {
   // Otherwise we log any errors
   function addNewBook(e) {
     e.preventDefault();
+    console.log(isSelected)
     const bodyObj = {
-      title: "",
-      author: "",
-      synopsis: "",
-      ReaderId: ""
+      image: isImage,
+      title: isSelected,
+      author: isAuthor,
+      infoLink: isInfoLink,
+      ReaderId: currentUser.id
     }
     console.log(bodyObj);
-    axios.post("/api/host-new-game", bodyObj)
+    axios.post("/api/save-book", bodyObj)
       .then(res => {
         console.log(res);
         if (!res.data.errmsg) {
@@ -59,8 +64,10 @@ function Search({ loggedIn, currentUser }) {
   }
 
   const handleBookChange = e => {
-    setIsSelected(e.target.name);
-    console.log(e.target.name)
+    setIsSelected(e.target.title);
+    setIsImage(e.target.src);
+    setIsAuthor(e.target.name);
+    setIsInfoLink(e.target.value);
   }
 
   if (!loggedIn) return (<div> Please log in to use this app! <Link to="/login">Login</Link>
@@ -81,23 +88,22 @@ function Search({ loggedIn, currentUser }) {
         <button onClick={searchBooks} type="button" className="btn btn-outline-dark col-4">Search</button>
 
         <Link className="col-4" to="/library"><button type="button" className="btn btn-outline-dark col-12">My Library</button></Link>
-        {/* { //Check if message failed
-          (result.length < 0)
+        { //Check if message failed
+          (result.length === 0)
         ? <div></div>
         : <button onClick={addNewBook} type="button" className="btn btn-outline-dark col-4">Add to Shelf</button>
-        } */}
+        }
       </div>
       <div className="row">
-        {
-          (result.length < 0)
-            ? <p>Search for books!</p>
-            : result.map(book => <div className="row" key={book.id}>
-              <input onChange={handleBookChange} name={book.volumeInfo.title} checked={isSelected === book.volumeInfo.title} type="checkbox" class="form-check-input time-dropbox" id="exampleCheck1"></input>
+        {result.length === 0 ? (
+        <h5>Search for books!</h5>
+        ) : (result.map(book => <div className="row" key={book.id}>
+              <input onChange={handleBookChange} src={book.volumeInfo.imageLinks.thumbnail} title={book.volumeInfo.title} name={book.volumeInfo.authors} value={book.volumeInfo.infoLink} checked={isSelected === book.volumeInfo.title} type="checkbox" className="form-check-input" id="exampleCheck1"></input>
               <img className="col-2" src={book.volumeInfo.imageLinks.thumbnail}></img>
               <h6 className="col-5 black-headings">{book.volumeInfo.title}</h6>
               <h6 className="col-2 black-headings">{book.volumeInfo.authors}</h6>
               <a className="col-2 link-text" href={book.volumeInfo.infoLink}>Link</a>
-            </div>)
+            </div>))
         }
       </div>
     </div>

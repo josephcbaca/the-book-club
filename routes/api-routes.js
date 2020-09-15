@@ -61,26 +61,34 @@ module.exports = function (app) {
     let apiKey = process.env.DB_API
     Axios.get("https://www.googleapis.com/books/v1/volumes?q="+book+"+inauthor:keyes&key="+apiKey+"&maxResults=10")
     .then(data => {
-  
-      console.log(data.data.items)
       res.json(data.data.items)
     })
   });
 
-
+  // Posts a new book to database
+  app.post("/api/save-book", (req, res) => {
+    console.log(req.body);
+    db.Book.create({
+      image: req.body.image,
+      title: req.body.title,
+      author: req.body.author,
+      infoLink: req.body.infoLink,
+      ReaderId: req.body.ReaderId
+    })
+      .then(() => res.end())
+      .catch(err => {
+        res.status(401).json(err);
+      });
+  });
   
-
-  // 
-
   // Library
   // GET route for retrieiving books for specific readers
-  app.get("/api/library", (req, res) => {
+  app.get("/api/my-library", (req, res) => {
     db.Book.findAll({
       where: {
-        ReaderId: req.Reader.id
+        ReaderId: req.user.id
       }
     }).then(data => {
-      console.log(data)
       res.json(data);
     });
   });

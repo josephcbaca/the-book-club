@@ -1,5 +1,9 @@
 module.exports = function (sequelize, DataTypes) {
     const Book = sequelize.define("Book", {
+      image: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
         title: {
             type: DataTypes.STRING,
             allowNull: false
@@ -8,8 +12,8 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
-        synopsis: {
-            type: DataTypes.TEXT,
+        infoLink: {
+            type: DataTypes.STRING,
             allowNull: false
         }
     })

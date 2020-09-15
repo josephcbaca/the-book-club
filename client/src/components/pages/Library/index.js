@@ -5,43 +5,25 @@ import Navbar from '../../Navbar'
 import './style.css'
 
 function Books({ loggedIn, currentUser }) {
-    // Setting our component's initial state
-    const [books, setBooks] = useState([])
-    const [formObject, setFormObject] = useState({
-        title: "",
-        author: "",
-        synopsis: ""
-    })
+    const currentUserId = currentUser.id
+    const [library, setLibrary] = useState([]);
+    const [isSelected, setIsSelected] = useState("")
 
-    // Load all books and store them with setBooks
-    useEffect(() => {
-        loadBooks()
-    }, [])
-
-    // Loads all books and sets them to books
-    function loadBooks() {
-        axios.get("/api/library")
-            .then(res =>
-                console.log(res)
-                // setBooks(res.data)
-            )
-            .catch(err => console.log(err));
-    };
-
-    // Deletes a book from the database with a given id, then reloads books from the db
-    function deleteBook(id) {
-        // API.deleteBook(id)
-        //     .then(res => loadBooks())
-        //     .catch(err => console.log(err));
+    const getLibrary = () => {
+    const bodyObj = {
+        ReaderId: currentUserId
+    }
+    axios.get("/api/my-library", bodyObj)
+        .then(res => {
+            setLibrary(res.data)
+        })
     }
 
-    // Handles updating component state when the user types into the input field
-    function handleInputChange(event) {
-        const { name, value } = event.target;
-        setFormObject({ ...formObject, [name]: value })
-    };
+    useEffect(getLibrary, []);
 
-
+    const handleBookChange = e => {
+        setIsSelected(e.target.title);
+    }
 
     if (!loggedIn) return (<div> Please log in to use this app! <Link to="/login">Login</Link>
     </div>);
@@ -49,28 +31,18 @@ function Books({ loggedIn, currentUser }) {
         <Navbar />
         <div className="container">
             <h1>My Library</h1>
-            {/* {
-        books.length ? (
-            <List>
-                {books.map(book => {
-                    return (
-                        <ListItem key={book._id}>
-                            <a href={"/books/" + book._id}>
-                                <strong>
-                                    {book.title} by {book.author}
-                                </strong>
-                            </a>
-                            <DeleteBtn onClick={() => deleteBook(book._id)} />
-                        </ListItem>
-                    );
-                })}
-            </List>
-
-        ) : (
-                <h3>No Results to Display</h3>
-            )
-            
-    } */}
+            <div className="row">
+                {library.length === 0 ? (
+                    <h5>Search for books!</h5>
+                ) : (library.map(book => <div className="row" key={book.id}>
+                    <input onChange={handleBookChange} title={book.title} checked={isSelected === book.title} type="checkbox" className="form-check-input" id="exampleCheck1"></input>
+                    <img className="col-2" src={book.image}></img>
+                    <h6 className="col-5 black-headings">{book.title}</h6>
+                    <h6 className="col-2 black-headings">{book.author}</h6>
+                    <a className="col-2 link-text" href={book.infoLink}>Link</a>
+                </div>))
+                }
+            </div>
         </div >
     </div>
     );
