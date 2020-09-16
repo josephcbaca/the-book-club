@@ -56,8 +56,8 @@ module.exports = function (app) {
   });
 
   app.get("/api/search-books", (req, res) => {
-    console.log(req.body.searchBooks)
-    let book = req.body.searchBooks
+    console.log(req.body)
+    let book = req.body
     let apiKey = process.env.DB_API
     Axios.get("https://www.googleapis.com/books/v1/volumes?q="+book+"+inauthor:keyes&key="+apiKey+"&maxResults=10")
     .then(data => {
